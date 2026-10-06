@@ -1,5 +1,7 @@
 import threading
 import unittest
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 from northstar.api import APIServer
 from northstar.http import request_json, RemoteError, ToolClient
@@ -26,6 +28,22 @@ class HTTPIsolationTests(unittest.TestCase):
         with self.assertRaises(RemoteError) as error:
             request_json(self.url + '/admin/sessions', {}, session['session_token'])
         self.assertEqual(error.exception.status, 403)
+
+    def test_finalize_consumes_request_body_before_closing(self):
+        session = self.session()
+        result = request_json(self.url + '/admin/sessions/' + session['session_id'] + '/finalize', {'padding': 'x' * 250_000}, 'test-admin-private')
+        self.assertTrue(result['closed'])
+
+    def test_finalize_rejects_malformed_json_instead_of_ignoring_body(self):
+        session = self.session()
+        req = Request(self.url + '/admin/sessions/' + session['session_id'] + '/finalize', data=b'{"malformed":',
+                      headers={'Authorization': 'Bearer test-admin-private', 'Content-Type': 'application/json'})
+        try:
+            with urlopen(req, timeout=5) as response:
+                status = response.status
+        except HTTPError as exc:
+            status = exc.code
+        self.assertEqual(status, 400)
 
     def test_sessions_are_independent_and_finalize_freezes_writes(self):
         one, two = self.session(), self.session()

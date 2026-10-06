@@ -57,12 +57,15 @@ class Handler(BaseHTTPRequestHandler):
             pass
 
     def body(self):
+        if hasattr(self, '_payload'):
+            return self._payload
         length = int(self.headers.get('Content-Length', '0'))
         if length < 0 or length > 2_000_000:
             raise ValueError('Payload too large')
         value = json.loads(self.rfile.read(length) or b'{}')
         if not isinstance(value, dict):
             raise ValueError('JSON object required')
+        self._payload = value
         return value
 
     def bearer(self):
@@ -82,6 +85,12 @@ class Handler(BaseHTTPRequestHandler):
         self.send_json(404, {'error': {'code': 'NOT_FOUND', 'message': 'Route not found', 'retryable': False}})
 
     def do_POST(self):
+        # Drain valid request bodies before responding or closing the connection.
+        # Otherwise some TCP stacks reset responses to early admin/auth failures.
+        try:
+            self.body()
+        except (ValueError, TypeError) as exc:
+            return self.send_json(400, {'error': {'code': 'INVALID_REQUEST', 'message': str(exc), 'retryable': False}})
         if self.path.startswith('/admin/'):
             return self.handle_admin('POST')
         if not self.path.startswith('/v1/tools/'):
