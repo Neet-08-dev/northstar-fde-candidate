@@ -225,7 +225,7 @@ class World:
         if any(v['ticket_id'] == ticket_id for v in self.data['visits']):
             self._error('ALREADY_SCHEDULED', 'Ticket already has a scheduled visit')
         return self._new('visits', 'VISIT-', {'customer_id': ticket['customer_id'], 'ticket_id': ticket_id, 'technician_id': technician_id,
-                        'starts_at': starts_at, 'duration_minutes': 60, 'status': 'scheduled'})
+                        'starts_at': utc(starts_at).isoformat().replace('+00:00', 'Z'), 'duration_minutes': 60, 'status': 'scheduled'})
 
     def _request_approval(self, invoice_id, amount_cents, reason, idempotency_key):
         invoice = self._get('invoices', invoice_id)

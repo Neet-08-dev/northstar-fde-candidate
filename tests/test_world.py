@@ -39,6 +39,10 @@ class WorldContractTests(unittest.TestCase):
             self.call('schedule_visit', ticket_id='T001', technician_id='TECH003', starts_at='2030-04-08T10:00:00Z', idempotency_key='schedule-1')
         self.assertEqual(error.exception.code, 'SKILL_MISMATCH')
 
+    def test_equivalent_offset_bookings_are_stored_as_utc(self):
+        visit = self.call('schedule_visit', ticket_id='T001', technician_id='TECH001', starts_at='2030-04-08T15:00:00+01:00', idempotency_key='offset-schedule')
+        self.assertEqual(visit['starts_at'], '2030-04-08T14:00:00Z')
+
     def test_unverified_principal_cannot_write(self):
         self.world.actor['verified'] = False
         with self.assertRaises(ToolError) as error:

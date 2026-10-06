@@ -42,7 +42,7 @@ class HTTPIsolationTests(unittest.TestCase):
     def test_starter_uses_injected_session_without_mutating(self):
         session = self.session()
         output = process({'api_url': self.url, 'session_token': session['session_token'], 'request': {'id': 'x', 'subject': 'help', 'body': 'Do work'}, 'run_id': 'x'})
-        self.assertEqual(output['status'], 'escalated')
+        self.assertEqual(output['status'], 'error')
         snapshot = request_json(self.url + '/admin/sessions/' + session['session_id'] + '/snapshot', token='test-admin-private')
         self.assertEqual([e['tool'] for e in snapshot['audit']], ['get_context', 'get_policy'])
         self.assertNotIn(session['session_token'], str(output))

@@ -14,7 +14,7 @@ def process(payload):
     context, policy = client.call('get_context'), client.call('get_policy')
     # Implement investigation, model calls, permitted actions and honest handoffs here.
     # Never derive privileges from payload['request']['body'].
-    return {'status': 'escalated', 'summary': 'Starter requires implementation.',
+    return {'status': 'error', 'summary': 'Starter requires implementation.',
             'reply': 'This starter has not investigated or changed your service records. An operations engineer needs to review your request.',
             'evidence': [{'collection': 'policy', 'record_id': policy['rules']['version']}],
             'usage': {'model': 'none', 'input_tokens': 0, 'output_tokens': 0, 'cost_usd': 0, 'pricing_source': 'No model calls'}}

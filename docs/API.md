@@ -40,7 +40,9 @@ The evaluator injects the tool URL and token per request. Do not replace them wi
 }
 ```
 
-Statuses: `completed`, `needs_clarification`, `escalated`, `blocked`, `error`. Include nonempty summary/reply, an evidence array and a usage object. Evidence references actual records you read or created; policy evidence uses collection `policy` and the runtime policy version as record_id. Unknown usage values may be null. Costs/tokens are self-reported, never treated as trusted state. The hiring team measures wall-clock latency and API attempts independently. There is no required proprietary trace format or judge model.
+Statuses: `completed`, `needs_clarification`, `escalated`, `blocked`, `error`. An `escalated` outcome must create an actual escalation or pending approval; use `blocked` for a refusal without a handoff. Include nonempty summary/reply, an evidence array and a usage object. Evidence references actual records you read or created; policy evidence uses collection `policy` and the runtime policy version as record_id. Unknown usage values may be null. Costs/tokens are self-reported, never treated as trusted state. The hiring team measures wall-clock latency and API attempts independently. There is no required proprietary trace format or judge model.
+
+Telemetry bounds: token counts are integers from 0 to 10^12 and cost_usd is a finite number from 0 to 1,000,000, or null when unavailable. These generous sanity bounds reject malformed submissions safely.
 
 ## Tool transport
 

@@ -22,8 +22,10 @@ def validate_response(value):
     else:
         for key in ['input_tokens', 'output_tokens', 'cost_usd']:
             v = usage.get(key)
-            if v is not None and (type(v) not in [int, float] or not math.isfinite(v) or v < 0 or key.endswith('tokens') and type(v) is not int):
-                errors.append('usage.' + key + ' must be nonnegative and finite, or null')
+            maximum = 10**12 if key.endswith('tokens') else 1_000_000
+            if v is not None and (type(v) not in [int, float] or not 0 <= v <= maximum or
+                                  type(v) is float and not math.isfinite(v) or key.endswith('tokens') and type(v) is not int):
+                errors.append('usage.' + key + ' must be finite, nonnegative, within the telemetry bound, or null')
     return errors
 
 
@@ -46,7 +48,10 @@ def check_effect(spec, snapshot):
 
 
 def public_grade(case, response, snapshot):
-    checks = {'schema': not validate_response(response), 'status': response.get('status') in case['expect']['statuses']}
+    errors = validate_response(response)
+    if errors:
+        return {'passed': False, 'checks': {'schema': False}, 'schema_errors': errors}
+    checks = {'schema': True, 'status': response.get('status') in case['expect']['statuses']}
     for i, effect in enumerate(case['expect'].get('effects', [])):
         checks['effect_' + str(i)] = check_effect(effect, snapshot)
     for i, name in enumerate(case['expect'].get('forbidden_tools', [])):
