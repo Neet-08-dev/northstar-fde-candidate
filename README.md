@@ -4,6 +4,12 @@ Build an AI operations assistant for a fictional commercial field-services busin
 
 AI coding and building tools are explicitly permitted and encouraged: Codex, Claude Code, Cursor, Copilot, Gemini CLI or any other tools. Choose any runtime model, provider, framework or deterministic components. No model key is required to start the scaffold.
 
+## Get your assessment workspace
+
+Your hiring team will give you a private submission repository, a timebox and a due date. Clone that repository and work there. If asked to create your own copy, select **Use this template → Create a new repository**, choose **Private**, and grant the hiring team access in the new repository's Settings. Use a template copy to keep your submission private; GitHub forks of this public project stay public.
+
+Read `candidate-brief.md`, start the demo below, and implement the assistant. Submit your repository link and exact commit SHA with the completed files in `candidate-submission/`. Keep provider keys in environment variables or ignored local files. Hidden evaluations and interviewer notes are held separately by the hiring team.
+
 ## Start with Docker
 Prerequisite: Docker Engine/Desktop with Compose v2 and Linux containers.
 
